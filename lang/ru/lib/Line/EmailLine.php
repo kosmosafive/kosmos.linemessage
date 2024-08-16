@@ -1,0 +1,6 @@
+<?php
+
+$MESS['KOSMOS_EMAIL_LINE_ERROR_SEND_RESULT_F'] = 'Ошибка отправки';
+$MESS['KOSMOS_EMAIL_LINE_ERROR_SEND_RESULT_0'] = 'Шаблон не найден';
+$MESS['KOSMOS_EMAIL_LINE_ERROR_SEND_RESULT_N'] = 'Ошибка отправки';
+$MESS['KOSMOS_LINE_MESSAGE_EMAIL_CAN_APPLY_ERROR'] = 'Не был передан Email';
