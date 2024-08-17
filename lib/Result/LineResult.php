@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kosmos\LineMessage\Result;
 
 use Bitrix\Main\Result;
@@ -7,13 +9,13 @@ use Kosmos\LineMessage\Line\LineInterface;
 
 class LineResult extends Result
 {
-    protected bool $isApplied;
+    protected bool $handled = false;
 
-    public function __construct(protected LineInterface $line)
+    public function __construct(
+        protected readonly LineInterface $line
+    )
     {
         parent::__construct();
-
-        $this->isApplied = false;
     }
 
     public function getLine(): LineInterface
@@ -21,14 +23,14 @@ class LineResult extends Result
         return $this->line;
     }
 
-    public function isApplied(): bool
+    public function isHandled(): bool
     {
-        return $this->isApplied;
+        return $this->handled;
     }
 
-    public function setApplied(bool $isApplied): static
+    public function setHandled(bool $handled): LineResult
     {
-        $this->isApplied = $isApplied;
+        $this->handled = $handled;
         return $this;
     }
 }

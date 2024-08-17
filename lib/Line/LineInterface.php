@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kosmos\LineMessage\Line;
 
-use Kosmos\LineMessage\Result\LineResult;
+use Bitrix\Main\Result;
 
 interface LineInterface
 {
-    public function send(array $context = []): LineResult;
+    public function canHandle(array $context): Result;
+    public function handle(array $context): Result;
 
     public function getConfigId(): string;
 }
