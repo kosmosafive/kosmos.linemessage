@@ -1,18 +1,49 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kosmos\LineMessage;
 
-use Kosmos\LineMessage\Line\LineCollection;
+use Kosmos\LineMessage\Result\LineResult;
 use Kosmos\LineMessage\Result\LineResultCollection;
 
 class Sender
 {
-    public static function send(LineCollection $lines, array $context): LineResultCollection
+    protected ?LineResultCollection $lineResultCollection = null;
+
+    public function __construct(
+        protected readonly Line\Collection $lineCollection,
+        protected readonly array $context
+    ) {
+    }
+
+    public function send(): LineResultCollection
     {
-        $resultCollection = new LineResultCollection();
-        foreach ($lines as $line) {
-            $resultCollection->add($line->send($context));
+        if (!$this->lineResultCollection) {
+            $this->lineResultCollection = new LineResultCollection();
+            foreach ($this->lineCollection as $line) {
+                $this->lineResultCollection->add($this->sendLine($line));
+            }
         }
-        return $resultCollection;
+
+        return $this->lineResultCollection;
+    }
+
+    protected function sendLine(Line\LineInterface $line): LineResult
+    {
+        $result = new LineResult($line);
+
+        $canApplyResult = $line->canHandle($this->context);
+        if (!$canApplyResult->isSuccess()) {
+            return $result->addErrors($canApplyResult->getErrors());
+        }
+        $result->setHandled(true);
+
+        $handleResult = $line->handle($this->context);
+        if (!$handleResult->isSuccess()) {
+            return $result->addErrors($handleResult->getErrors());
+        }
+
+        return $result->setData($handleResult->getData());
     }
 }

@@ -1,7 +1,8 @@
 <?php
 
-namespace Kosmos\LineMessage;
+declare(strict_types=1);
 
+namespace Kosmos\LineMessage\Structure;
 
 abstract class Collection implements \ArrayAccess, \Iterator, \Countable
 {

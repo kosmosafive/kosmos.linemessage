@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Kosmos\LineMessage\Result;
 
-use Bitrix\Main\Error;
-use Kosmos\LineMessage\Line\LineInterface;
+use Bitrix\Main\ErrorCollection;
 use SplObjectStorage;
+use Kosmos\LineMessage\Line\LineInterface;
 
 class LineResultCollection implements \ArrayAccess, \Iterator, \Countable
 {
@@ -26,11 +28,63 @@ class LineResultCollection implements \ArrayAccess, \Iterator, \Countable
         return $this->results[$line] ?? null;
     }
 
+    public function getSuccessCollection(): LineResultCollection
+    {
+        $successCollection = new LineResultCollection();
+        foreach ($this->results as $key) {
+            /** @var LineResult $lineResult */
+            $lineResult = $this->results[$key];
+            if ($lineResult->isSuccess()) {
+                $successCollection->add($lineResult);
+            }
+        }
+        return $successCollection;
+    }
+
+    public function getFailureCollection(): LineResultCollection
+    {
+        $successCollection = new LineResultCollection();
+        foreach ($this->results as $key) {
+            /** @var LineResult $lineResult */
+            $lineResult = $this->results[$key];
+            if (!$lineResult->isSuccess()) {
+                $successCollection->add($lineResult);
+            }
+        }
+        return $successCollection;
+    }
+
+    public function getHandledCollection(): LineResultCollection
+    {
+        $successCollection = new LineResultCollection();
+        foreach ($this->results as $key) {
+            /** @var LineResult $lineResult */
+            $lineResult = $this->results[$key];
+            if ($lineResult->isHandled()) {
+                $successCollection->add($lineResult);
+            }
+        }
+        return $successCollection;
+    }
+
+    public function getUnhandledCollection(): LineResultCollection
+    {
+        $successCollection = new LineResultCollection();
+        foreach ($this->results as $key) {
+            /** @var LineResult $lineResult */
+            $lineResult = $this->results[$key];
+            if (!$lineResult->isHandled()) {
+                $successCollection->add($lineResult);
+            }
+        }
+        return $successCollection;
+    }
+
     public function isSuccess(): bool
     {
-        foreach ($this->results as $_) {
+        foreach ($this->results as $key) {
             /** @var LineResult $lineResult */
-            $lineResult = $this->results->getInfo();
+            $lineResult = $this->results[$key];
             if (!$lineResult->isSuccess()) {
                 return false;
             }
@@ -38,27 +92,27 @@ class LineResultCollection implements \ArrayAccess, \Iterator, \Countable
         return true;
     }
 
-    public function isApplied(): bool
+    public function isHandled(): bool
     {
-        foreach ($this->results as $_) {
+        foreach ($this->results as $key) {
             /** @var LineResult $lineResult */
-            $lineResult = $this->results->getInfo();
-            if (!$lineResult->isApplied()) {
+            $lineResult = $this->results[$key];
+            if (!$lineResult->isHandled()) {
                 return false;
             }
         }
         return true;
     }
 
-    public function getErrors(): array
+    public function getErrorCollection(): ErrorCollection
     {
-        $errors = [];
-        foreach ($this->results as $_) {
+        $errorCollection = new ErrorCollection();
+        foreach ($this->results as $key) {
             /** @var LineResult $lineResult */
-            $lineResult = $this->results->getInfo();
-            $errors[] = $lineResult->getErrors();
+            $lineResult = $this->results[$key];
+            $errorCollection->add($lineResult->getErrors());
         }
-        return array_merge(...$errors);
+        return $errorCollection;
     }
 
     public function current(): LineResult
