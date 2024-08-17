@@ -20,6 +20,43 @@
 
 - Установить модуль
 
+### Установка через composer
+
+В composer.json (пример для директории local) проекта добавьте
+
+```json
+{
+  "require": {
+    "wikimedia/composer-merge-plugin": "dev-master"
+  },
+  "config": {
+    "allow-plugins": {
+      "wikimedia/composer-merge-plugin": true
+    }
+  },
+  "extra": {
+    "merge-plugin": {
+      "require": [
+        "../bitrix/composer-bx.json",
+        "modules/*/composer.json"
+      ],
+      "recurse": true,
+      "replace": true,
+      "ignore-duplicates": false,
+      "merge-dev": true,
+      "merge-extra": false,
+      "merge-extra-deep": false,
+      "merge-scripts": false
+    },
+    "installer-paths": {
+      "modules/{$name}/": [
+        "type:bitrix-d7-module"
+      ]
+    }
+  }
+}
+```
+
 ## Использование
 
 ### Отправка сообщений по каналам связи
